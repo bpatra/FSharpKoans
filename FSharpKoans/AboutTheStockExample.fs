@@ -1,5 +1,6 @@
 ﻿namespace FSharpKoans
 open FSharpKoans.Core
+open System.Globalization
 
 //---------------------------------------------------------------
 // Apply Your Knowledge!
@@ -57,6 +58,21 @@ module ``about the stock example`` =
 
     [<Koan>]
     let YouGotTheAnswerCorrect() =
-        let result =  __
         
-        AssertEquality "2012-03-13" result
+        let parsedStocks = stockData
+                                |> List.tail
+                                |> List.map 
+                                (fun line -> 
+                                    let tokens = line.Split([|','|]) 
+                                    let parse (value:string) = System.Double.Parse( value, CultureInfo.InvariantCulture.NumberFormat)
+                                    (tokens.[0],  parse tokens.[1], parse tokens.[4] )
+                                )
+        let firstOrderedStocks = parsedStocks 
+                                |> List.maxBy (fun tuple -> 
+                                    let  _, openVal, closeVal = tuple
+                                    abs openVal - closeVal
+                                )
+                                
+        let result, _,_ = firstOrderedStocks
+        
+        AssertEquality "2012-03-19" result
